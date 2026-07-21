@@ -61,13 +61,6 @@ def get_all_todo_entries():
 @todo_router.put("/todos/{id}", response_model=TodoItemResponse, status_code=status.HTTP_200_OK)
 def update_todo_entry(id: str, updated_todo: TodoItem):
 
-    # Stores the document with the desired todo entry if the passed id matches an existing id
-    updated_todo_document = TodoList.find_one({"_id": ObjectId(id)})
-
-    # If the id passed is not found, updated_todo_document is empty and an error is raised
-    if not updated_todo_document:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The entered todo id does not exist")
-    
     # The document which has an id that matches the passed id is updated
     updated_todo_document = TodoList.find_one_and_update(
         {"_id": ObjectId(id)},
@@ -81,5 +74,26 @@ def update_todo_entry(id: str, updated_todo: TodoItem):
         return_document=ReturnDocument.AFTER
     )
     
-    # The updated todo entry has its data validated by the response model and is then returned
-    return {"id": str(updated_todo_document["_id"]), "title": updated_todo_document["title"], "description": updated_todo_document["description"]}
+    # If the id passed is not found, updated_todo_document is empty and an error is raised
+    if not updated_todo_document:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The entered todo id does not exist")
+    else:
+        # The updated todo entry has its data validated by the response model and is then returned
+        return {"id": str(updated_todo_document["_id"]), "title": updated_todo_document["title"], "description": updated_todo_document["description"]}
+
+
+# Endpoint used to delete a single todo by id
+@todo_router.delete("/todos/{id}", status_code = status.HTTP_204_NO_CONTENT)
+def delete_todo_entry(id: str):
+
+    # The document which has an id that matches the passed id is deleted
+    deleted_todo_document = TodoList.find_one_and_delete(
+        {"_id": ObjectId(id)}
+    )
+
+    # If the id passed is not found, deleted_todo_document is empty and an error is raised
+    if not deleted_todo_document:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The entered todo id does not exist")
+    else:
+        # None is returned with the status code 204 after the todo entry is deleted
+        return None
