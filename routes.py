@@ -35,3 +35,23 @@ def get_todo_entry(id: str):
     
     # The data from the retrieved todo_entry along with the document id is validated by the response model and returned
     return {"id": id, "title": retrieved_todo_document["title"], "description": retrieved_todo_document["description"]}
+
+# Endpoint used to get all todo entries
+@todo_router.get("/todos", response_model=list[TodoItemResponse], status_code=status.HTTP_200_OK)
+def get_all_todo_entries():
+
+    # Stores a list of retrieved todo entries
+    retrieved_todo_documents = []
+
+    # Retrieves the data from each document inside the TodoList collection and stores the todo entries inside retrieved_todo_documents 
+    for todo in TodoList.find():
+        retrieved_todo_documents.append(
+            {
+                "id": str(todo["_id"]),
+                "title": todo["title"],
+                "description": todo["description"] 
+            }
+        )
+    
+    # The todo entries retrieved from the TodoList collection have their data validated by the response model and are returned
+    return retrieved_todo_documents
