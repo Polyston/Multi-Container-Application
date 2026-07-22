@@ -1,0 +1,9 @@
+# Ignores everything
+*
+
+# The selected files are not ignored
+!main.py
+!routes.py
+!database.py
+!schemas.py
+!requirements.txt

@@ -1,0 +1,52 @@
+services:
+  app:
+
+    # The dockerfile inside the current directory is used to build the docker image for the app service
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    
+    # The name for the docker container is set
+    container_name: multi-container-application
+
+    # Restarts the container unless stopped by the user
+    restart: unless-stopped
+
+    # The docker containers port 8000 is used on port 3000 locally 
+    ports:
+      - "3000:8000"
+    
+    # Environment variables are set for the app service
+    environment:
+
+    # Sets the url to the mongodb database server
+      mongodb_url:
+        "mongodb://mongodb:27017"
+    
+    # The mongodb service must be started before 
+    depends_on:
+      - mongodb
+
+  mongodb:
+
+    # The latest mongodb docker image is used to build the docker image for the mongodb service
+    image: mongodb/mongodb-community-server:latest
+
+    # The name for the docker container is set
+    container_name: mongodb
+
+    # Restarts the container unless stopped by the user
+    restart: unless-stopped
+
+    # The docker containers port 27017 is used on port 27017 locally 
+    ports:
+      - "27017:27017"
+    
+    # Attaches the mongodb volume to the mongodb docker container
+    volumes:
+      - mongodb:/data/db
+
+# Creates a volume for persistent storage
+volumes:
+  mongodb:
+
